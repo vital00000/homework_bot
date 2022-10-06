@@ -38,6 +38,21 @@ HOMEWORK_STATUSES = {
 }
 
 
+def init_logger():
+    """Loggining в отдельной функции."""
+    logging.basicConfig(
+        level=logging.INFO,
+        format=(
+            '%(asctime)s [%(levelname)s] - '
+            '(%(filename)s).%(funcName)s:%(lineno)d - %(message)s'
+        ),
+        handlers=[
+            logging.FileHandler('output.log'),
+            logging.StreamHandler(sys.stdout)
+        ]
+    )
+
+
 def send_message(bot, message):
     """Начали отправку сообщения в Telegram."""
     try:
@@ -152,9 +167,9 @@ def main():
             if message != homework_statuses:
                 send_message(bot, message)
                 homework_statuses = message
-        except Exception as error:
-            logger.error(error)
-            telegram_message = str(error)
+        except Exception:
+            logger.error('Ожидание ответа')
+            telegram_message = str('Началась проверка домашнего задания')
             if telegram_message != error_cache_message:
                 send_message(bot, telegram_message)
                 error_cache_message = telegram_message
@@ -163,15 +178,5 @@ def main():
 
 
 if __name__ == '__main__':
-    logging.basicConfig(
-        level=logging.INFO,
-        format=(
-            '%(asctime)s [%(levelname)s] - '
-            '(%(filename)s).%(funcName)s:%(lineno)d - %(message)s'
-        ),
-        handlers=[
-            logging.FileHandler('output.log'),
-            logging.StreamHandler(sys.stdout)
-        ]
-    )
+    init_logger()
     main()
