@@ -170,11 +170,11 @@ def main():
             logger.error('Ожидание ответа')
             telegram_message = str('Началась проверка домашнего задания')
             if telegram_message != error_message:
-                try:
-                    send_message(bot, telegram_message)
-                    error_message = telegram_message
-                except:
-                    logger.error('Отправка сообщения не возможна,не работает приложение телеграмм')
+                send_message(bot, telegram_message)
+                error_message = telegram_message
+                logger.error('Отправка сообщения не возможна, '
+                             'не работает приложение телеграмм;'
+                             )
         finally:
             time.sleep(RETRY_TIME)
 
