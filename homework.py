@@ -27,11 +27,11 @@ PRACTICUM_TOKEN = os.getenv('PRACTICUM_TOKEN')
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
-RETRY_TIME = os.getenv('RETRY_TIME')
+RETRY_TIME = os.getenv('RETRY_TIME', 600)
 ENDPOINT = 'https://practicum.yandex.ru/api/user_api/homework_statuses/'
 HEADERS = {'Authorization': f'OAuth {PRACTICUM_TOKEN}'}
 
-HOMEWORK_STATUSES = {
+HOMEWORK_VERDICTS = {
     'approved': 'Работа проверена: ревьюеру всё понравилось. Ура!',
     'reviewing': 'Работа взята на проверку ревьюером.',
     'rejected': 'Работа проверена: у ревьюера есть замечания.'
@@ -66,12 +66,12 @@ def send_message(bot, message):
             f' {TELEGRAM_CHAT_ID}: '
             f'{message}'
         )
-        bot.send_message(TELEGRAM_CHAT_ID, message)
         logger.info(
             f'Успешная отправка сообщения в чат'
             f' {TELEGRAM_CHAT_ID}: '
             f'{message}'
         )
+        bot.send_message(TELEGRAM_CHAT_ID, message)
     except Exception:
         raise ValueError('Ошибка отправки сообщения')
 
@@ -127,9 +127,9 @@ def parse_status(homework):
         raise Exception('Отсутствует ключ "status" в ответе API.')
     homework_name = homework.get('homework_name')
     homework_status = homework['status']
-    if homework_status not in HOMEWORK_STATUSES:
+    if homework_status not in HOMEWORK_VERDICTS:
         raise Exception(f'Неизвестный статус работы: {homework_status}')
-    verdict = HOMEWORK_STATUSES[homework_status]
+    verdict = HOMEWORK_VERDICTS[homework_status]
     return f'Изменился статус проверки работы "{homework_name}". {verdict}'
 
 
@@ -147,14 +147,13 @@ def main():
                         'TELEGRAM_CHAT_ID]'
                         )
         sys.exit('message')
-    else:
         try:
             bot = telegram.Bot(token=TELEGRAM_TOKEN)
         except Exception:
             logger.info('Ошибка создания бота')
     current_timestamp = int(time.time())
     homework_statuses = ''
-    error_cache_message = ''
+    error_message = ''
     while True:
         try:
             response = get_api_answer(current_timestamp)
@@ -170,9 +169,12 @@ def main():
         except Exception:
             logger.error('Ожидание ответа')
             telegram_message = str('Началась проверка домашнего задания')
-            if telegram_message != error_cache_message:
-                send_message(bot, telegram_message)
-                error_cache_message = telegram_message
+            if telegram_message != error_message:
+                try:
+                    send_message(bot, telegram_message)
+                    error_message = telegram_message
+                except:
+                    logger.error('Отправка сообщения не возможна,не работает приложение телеграмм')
         finally:
             time.sleep(RETRY_TIME)
 
