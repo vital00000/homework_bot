@@ -61,17 +61,12 @@ def send_message(bot, message):
             f'{TELEGRAM_CHAT_ID}: '
             f'{message}'
         )
-        logger.info(
-            f'Успешная отправка сообщения в чат'
-            f' {TELEGRAM_CHAT_ID}: '
-            f'{message}'
-        )
-        logger.info(
-            f'Успешная отправка сообщения в чат'
-            f' {TELEGRAM_CHAT_ID}: '
-            f'{message}'
-        )
         bot.send_message(TELEGRAM_CHAT_ID, message)
+        logger.info(
+            f'Успешная отправка сообщения в чат'
+            f' {TELEGRAM_CHAT_ID}: '
+            f'{message}'
+        )
     except Exception:
         raise ValueError('Ошибка отправки сообщения')
 
