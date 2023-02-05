@@ -70,6 +70,28 @@ def parse_status(homework):
     return f'Изменился статус проверки работы "{homework_name}". {verdict}'
 
 ```
+### **Как запустить проект:**
+```
+- Клонировать репозиторий и перейти в него в командной строке:
+
+  - git clone https://github.com/vital00000/homework_bot
+  - cd homework_bot
+
+- Cоздать и активировать виртуальное окружение:
+    - python3 -m venv env
+    - source env/bin/activate
+
+- Установить зависимости из файла requirements.txt:
+    - python3 -m pip install --upgrade pip
+    - pip install -r requirements.txt
+    
+- Выполнить миграции:
+    - python3 manage.py migrate
+    
+- Запустить проект:
+    -python3 manage.py runserver
+```
+
 ### **В проекте применены технологии:**
 ```
 Python 3.7.9
